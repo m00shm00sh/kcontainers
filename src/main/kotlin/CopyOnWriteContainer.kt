@@ -57,10 +57,12 @@ protected constructor(
         }
 
     /** Mark a container as immutable. This presents an optimization opportunity by finalizing the reference
-     * of the internal container. */
+     * of the internal container.
+     *
+     * Do not call this inside [write]; use [writeOnce] to freeze the container after write completes, */
     fun freeze() =
         lock.withLock {
-            immutable = true
+            doFreeze()
         }
 
     /** Perform a write on this container by applying [block] on a mutable fresh copy of the data,
@@ -69,7 +71,7 @@ protected constructor(
     fun <R> writeOnce(block: MutableContainerT.() -> R) =
         lock.withLock {
             val ret = writeInternal(block)
-            freeze()
+            doFreeze()
             ret
         }
 
@@ -80,6 +82,10 @@ protected constructor(
         val ret = newData.block()
         data = newData
         return ret
+    }
+
+    private fun doFreeze() {
+        immutable = true
     }
 
     // This is a container, so we must defer equals, hashCode, toString to the data itself
