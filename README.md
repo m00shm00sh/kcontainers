@@ -55,6 +55,10 @@ For more exotic cases, `CopyOnWriteContainer` can be used.
 the casting necessary to make it work negatively impacts readability without a good reason.
 Implementing it would be a trivial copy-paste of `CoWTracer` inside [test/kotlin/CopyOnWriteContainerTest].
 
+Caveat(s):
+- *CopyOnWriteList* - subList returns a snapshot, just like iterator; this is because *any* write qualifies as a
+  structural modification, and only non-structural writes need to be transparent.
+
 ## Circular iterator
 Inspired by Python's `itertools.cycle`, this presents an infinite cyclical view of a `List<E>`'s contents.
 

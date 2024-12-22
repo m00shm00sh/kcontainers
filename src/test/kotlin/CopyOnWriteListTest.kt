@@ -58,10 +58,12 @@ class CopyOnWriteListTest {
             add(3)
         }
         val sl = c0.subList(1, 2)
+	// reminder: all writes are structural
+        val `sl$0$exp` = c0[1]
         c0.write { this[1] = 4 }
         val slIter = sl.listIterator()
         assertAll(
-            { assertEquals(4, sl[0]) },
+            { assertEquals(`sl$0$exp`, sl[0]) },
             { assertDoesNotThrow { slIter.next() } }, // c0[2] sl[1]
             { assertTrue(slIter.toCollection().isEmpty()) },
             { assertDoesNotThrow { slIter.previous() } }, // c0[1] sl[0]
@@ -93,12 +95,9 @@ class CopyOnWriteListTest {
         }
         val sl0 = c0.subList(1, 5)
         val sl1 = sl0.subList(1, 2)
-        c0.write {
-            this[2] = 10
-        }
         assertAll(
-            { assertEquals(10, sl0[1]) },
-            { assertEquals(10, sl1[0]) }
+            { assertEquals(3, sl0[1]) },
+            { assertEquals(3, sl1[0]) }
         )
     }
 
