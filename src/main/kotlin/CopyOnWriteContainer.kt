@@ -1,11 +1,10 @@
-package com.moshy.containers.coroutines
+package com.moshy.containers
 
 import com.moshy.containers.util.constrainInitialData
 import com.moshy.containers.util.getDataOrNull
 import com.moshy.containers.util.getFrozenDataOrNull
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-
+import kotlinx.atomicfu.locks.ReentrantLock
+import kotlinx.atomicfu.locks.withLock
 import kotlin.concurrent.Volatile
 
 /**
@@ -27,7 +26,7 @@ protected constructor(
     @Volatile internal var immutable = false
         private set
     // an implementing class may need to acquire the lock for some operation
-    protected val lock = Mutex()
+    protected val lock = ReentrantLock()
 
     init {
         constrainInitialData(initialData)
@@ -37,7 +36,7 @@ protected constructor(
     protected fun copy() = copyConstructor(data)
 
     /** Perform a write on this container by applying [block] on a mutable fresh copy of the data. */
-    suspend fun <R> write(block: suspend MutableContainerT.() -> R) =
+    fun <R> write(block: MutableContainerT.() -> R) =
         lock.withLock {
             writeInternal(block)
         }
@@ -46,7 +45,7 @@ protected constructor(
      * of the internal container.
      *
      * Do not call this inside [write]; use [writeOnce] to freeze the container after write completes, */
-    suspend fun freeze() =
+    fun freeze() =
         lock.withLock {
             doFreeze()
         }
@@ -54,14 +53,14 @@ protected constructor(
     /** Perform a write on this container by applying [block] on a mutable fresh copy of the data,
      *  then set the container as immutable.
      */
-    suspend fun <R> writeOnce(block: suspend MutableContainerT.() -> R) =
+    fun <R> writeOnce(block: MutableContainerT.() -> R) =
         lock.withLock {
             val ret = writeInternal(block)
             doFreeze()
             ret
         }
 
-    private suspend fun <R> writeInternal(block: suspend MutableContainerT.() -> R): R {
+    private fun <R> writeInternal(block: MutableContainerT.() -> R): R {
         if (immutable)
             throw UnsupportedOperationException("already immutable")
         val newData = copy()
@@ -69,13 +68,14 @@ protected constructor(
         data = newData
         return ret
     }
+
     private fun doFreeze() {
         immutable = true
     }
 
     // This is a container, so we must defer equals, hashCode, toString to the data itself
     override fun equals(other: Any?): Boolean =
-        (this === other) || (getDataOrNull<ContainerT>(other)?.equals(this.data) == true)
+        (this === other) || (getDataOrNull(other)?.equals(this.data) == true)
 
     override fun hashCode(): Int = data.hashCode()
     override fun toString() = data.toString()

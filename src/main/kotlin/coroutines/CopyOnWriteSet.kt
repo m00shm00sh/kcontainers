@@ -1,8 +1,8 @@
-package com.moshy.containers
+package com.moshy.containers.coroutines
 
 /**
  * Copy on write [Set] that resembles [java.util.concurrent.CopyOnWriteArrayList] in that reads are unlocked but writes
- * are locked. All writes shall go through [write].
+ * are suspending. All writes shall go through [write].
  */
 open class CopyOnWriteSet<E>
 protected constructor(

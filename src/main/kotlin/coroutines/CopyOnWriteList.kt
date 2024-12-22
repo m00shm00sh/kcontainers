@@ -1,11 +1,10 @@
-package com.moshy.containers
+package com.moshy.containers.coroutines
 
 /**
  * Copy on write [List] that resembles [java.util.concurrent.CopyOnWriteArrayList] in that reads are unlocked but writes
- * are locked. All writes shall go through [write].
+ * are suspending. All writes shall go through [write].
  *
- * *Note*: `subList` returns a view of the current snapshot, much like `iterator`. All mutations count as structural
- *         and the list is read-only, anyway.
+ * *Note*: `subList` returns a view of the current snapshot, much like `iterator`. All mutations count as structural.
  */
 open class CopyOnWriteList<E>
 protected constructor(

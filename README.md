@@ -1,4 +1,3 @@
-(feature-branch: coroutines; locks are replaced with coroutines synchronized writing )
 # Kotlin containers
 
 Containers that are used in other projects.
@@ -42,7 +41,7 @@ al.write {
     }
 }
 ```
-It also makes it clearer to see where copying is occurring.
+It also makes it clearer to see where copying (and possibly coroutine suspension) is(/are) occurring.
 
 The same principle applies for Map and Set, with implementations for HashMap, LinkedHashMap and HashSet.
 CopyOnWriteHashSet is expected to be faster than `j.u.c.CopyOnWriteArraySet` because hashtable lookup is faster than a
@@ -55,6 +54,10 @@ For more exotic cases, `CopyOnWriteContainer` can be used.
 `CopyOnWriteCollection` is unimplemented because it would be unused by both `CopyOnWriteList` and `CopyOnWriteSet` as
 the casting necessary to make it work negatively impacts readability without a good reason.
 Implementing it would be a trivial copy-paste of `CoWTracer` inside [test/kotlin/CopyOnWriteContainerTest].
+
+Some users may prefer using Kotlin-style concurrency with suspending coroutines instead of threads, as
+Java interoperability is not a concern to them. To use those, import `com.moshy.containers.coroutines.CopyOnWriteXXX`.
+Those containers are interoperable with each other when reads are concerned.
 
 Caveat(s):
 - *CopyOnWriteList* - subList returns a snapshot, just like iterator; this is because *any* write qualifies as a

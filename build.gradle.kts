@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.moshy.containers"
-version = "0.1.1+coroutines"
+version = "0.2.0"
 
 repositories {
     mavenCentral()
