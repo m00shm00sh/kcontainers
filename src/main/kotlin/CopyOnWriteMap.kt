@@ -1,8 +1,10 @@
 package com.moshy.containers
 
+import com.moshy.containers.coroutines.CopyOnWriteContainer
+
 /**
  * Copy on write [Map] that resembles [java.util.concurrent.CopyOnWriteArrayList] in that reads are unlocked but writes
- * are locked. All writes shall go through [write].
+ * are suspending. All writes shall go through [write].
  */
 open class CopyOnWriteMap<K, V>
 protected constructor(

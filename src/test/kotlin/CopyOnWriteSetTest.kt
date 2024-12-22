@@ -4,6 +4,7 @@ import com.moshy.containers.util.toCollection
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import kotlin.test.assertContentEquals
+import kotlinx.coroutines.test.runTest
 
 /* Test that we forward Set behavior. CoW behavior already tested in CopyOnWriteContainerTest. */
 class CopyOnWriteSetTest {
@@ -11,7 +12,7 @@ class CopyOnWriteSetTest {
     private val s = "a"
 
     @Test
-    fun `test MutableSet`() {
+    fun `test MutableSet`() = runTest {
         val r1 = c0.write { add(s) }
         val r2 = c0.write { add(s) }
         assertAll(
@@ -21,7 +22,7 @@ class CopyOnWriteSetTest {
     }
 
     @Test
-    fun `test iterator snapshot`() {
+    fun `test iterator snapshot`() = runTest {
         var iter = c0.iterator()
         c0.write { add(s) }
         assertAll(

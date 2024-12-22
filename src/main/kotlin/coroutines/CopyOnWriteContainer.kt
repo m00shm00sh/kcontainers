@@ -1,7 +1,8 @@
-package com.moshy.containers
+package com.moshy.containers.coroutines
 
-import kotlinx.atomicfu.locks.ReentrantLock
-import kotlinx.atomicfu.locks.withLock
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+
 import kotlin.concurrent.Volatile
 
 /**
@@ -23,7 +24,7 @@ protected constructor(
     protected var immutable = false
         private set
     // an implementing class may need to acquire the lock for some operation
-    protected val lock = ReentrantLock()
+    protected val lock = Mutex()
 
     init {
         /* We can't constrain ContainerT to be a subclass of either Map or Collection inside
@@ -51,7 +52,7 @@ protected constructor(
     protected fun copy() = copyConstructor(data)
 
     /** Perform a write on this container by applying [block] on a mutable fresh copy of the data. */
-    fun <R> write(block: MutableContainerT.() -> R) =
+    suspend fun <R> write(block: suspend MutableContainerT.() -> R) =
         lock.withLock {
             writeInternal(block)
         }
@@ -60,7 +61,7 @@ protected constructor(
      * of the internal container.
      *
      * Do not call this inside [write]; use [writeOnce] to freeze the container after write completes, */
-    fun freeze() =
+    suspend fun freeze() =
         lock.withLock {
             doFreeze()
         }
@@ -68,14 +69,14 @@ protected constructor(
     /** Perform a write on this container by applying [block] on a mutable fresh copy of the data,
      *  then set the container as immutable.
      */
-    fun <R> writeOnce(block: MutableContainerT.() -> R) =
+    suspend fun <R> writeOnce(block: suspend MutableContainerT.() -> R) =
         lock.withLock {
             val ret = writeInternal(block)
             doFreeze()
             ret
         }
 
-    private fun <R> writeInternal(block: MutableContainerT.() -> R): R {
+    private suspend fun <R> writeInternal(block: suspend MutableContainerT.() -> R): R {
         if (immutable)
             throw UnsupportedOperationException("already immutable")
         val newData = copy()
@@ -83,7 +84,6 @@ protected constructor(
         data = newData
         return ret
     }
-
     private fun doFreeze() {
         immutable = true
     }

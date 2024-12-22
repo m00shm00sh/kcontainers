@@ -1,6 +1,6 @@
 package com.moshy.containers.util
 
-import com.moshy.containers.CopyOnWriteContainer
+import com.moshy.containers.coroutines.CopyOnWriteContainer
 
 import org.junit.jupiter.api.Assertions.*
 import kotlin.reflect.KProperty1

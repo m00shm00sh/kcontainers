@@ -5,6 +5,7 @@ import com.moshy.containers.util.toCollection
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import kotlin.test.assertContentEquals
+import kotlinx.coroutines.test.runTest
 
 /* Test that we forward Map behavior. CoW behavior already tested in CopyOnWriteContainerTest.
 *  LHM is used because entries.iterator().last() will have predictable behavior.
@@ -14,7 +15,7 @@ class CopyOnWriteMapTest {
     private val s = "a"
 
     @Test
-    fun `test MutableMap`() {
+    fun `test MutableMap`() = runTest {
         val r1 = c0.write { put(s, 1) }
         val r2 = c0.write { put(s, 2) }
         assertAll(
@@ -26,7 +27,7 @@ class CopyOnWriteMapTest {
     }
 
     @Test
-    fun `test iterator snapshot`() {
+    fun `test iterator snapshot`() = runTest {
         // Map gives us an Iterable through .entries or alternately through .keys and .values
         val iter = c0.iterator()
         c0.write { put(s, 1) }

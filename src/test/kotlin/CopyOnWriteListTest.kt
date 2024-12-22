@@ -4,13 +4,14 @@ import com.moshy.containers.util.toCollection
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import kotlin.test.assertContentEquals
+import kotlinx.coroutines.test.runTest
 
 /* Test that we forward List behavior. CoW behavior already tested in CopyOnWriteContainerTest. */
 class CopyOnWriteListTest {
     private lateinit var c0: CopyOnWriteList<Int>
 
     @Test
-    fun `test MutableList + get + index`() {
+    fun `test MutableList + get + index`() = runTest {
         c0.write {
             add(1)
             add(2)
@@ -24,7 +25,7 @@ class CopyOnWriteListTest {
     }
 
     @Test
-    fun `test contains + isEmpty`() {
+    fun `test contains + isEmpty`() = runTest {
         c0.write {
             add(1)
             add(2)
@@ -37,7 +38,7 @@ class CopyOnWriteListTest {
     }
 
     @Test
-    fun `test iterator snapshot`() {
+    fun `test iterator snapshot`() = runTest {
         var iter = c0.iterator()
         c0.write { add(1) }
         assertAll(
@@ -51,14 +52,13 @@ class CopyOnWriteListTest {
     }
 
     @Test
-    fun `test subList`() {
+    fun `test subList`() = runTest {
         c0.write {
             add(1)
             add(2)
             add(3)
         }
         val sl = c0.subList(1, 2)
-	// reminder: all writes are structural
         val `sl$0$exp` = c0[1]
         c0.write { this[1] = 4 }
         val slIter = sl.listIterator()
@@ -72,7 +72,7 @@ class CopyOnWriteListTest {
     }
 
     @Test
-    fun `test range`() {
+    fun `test range`() = runTest {
         c0.write {
             add(1)
             add(2)
@@ -88,7 +88,7 @@ class CopyOnWriteListTest {
     }
 
     @Test
-    fun `test recursive subList`() {
+    fun `test recursive subList`() = runTest {
         c0.write {
             for (i in 1..5)
                 add(i)
