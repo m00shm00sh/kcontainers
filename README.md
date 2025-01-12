@@ -85,8 +85,28 @@ val iter = inner.circularIterator()
 iter
 // >>> 2, 3, 2, 3, ...
 ```
+
 ## Multiple
 Like `Iterable<T>.single()`, but generalized to any number of items, which is passed as the first argument.
 
 `multipleOrNull` can be used so nulls are used instead of exceptions, as long as the item count is non-negative.
 
+## List transpose
+Reasons for needing the transpose of a list are straightforward. What's special here is a transform function can be
+used to aggregate the transpose inner row:
+```kotlin
+val l = listOf(
+  listOf(1, 2, 3),
+  listOf(4, 5, 6),
+  listOf(7, 8, 9)
+)
+l.transpose { it.sum() } // * HERE *
+// =>
+listOf(
+  listOf(1, 4, 7).sum(),
+  listOf(2, 5, 8).sum(),
+  listOf(3, 6, 9).sum()
+)
+// =>
+listOf(12, 15, 18)
+```
