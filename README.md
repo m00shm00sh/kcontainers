@@ -85,3 +85,8 @@ val iter = inner.circularIterator()
 iter
 // >>> 2, 3, 2, 3, ...
 ```
+## Multiple
+Like `Iterable<T>.single()`, but generalized to any number of items, which is passed as the first argument.
+
+`multipleOrNull` can be used so nulls are used instead of exceptions, as long as the item count is non-negative.
+
