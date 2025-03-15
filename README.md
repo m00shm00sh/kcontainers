@@ -110,3 +110,9 @@ listOf(
 // =>
 listOf(12, 15, 18)
 ```
+
+## List subListFrom, subListTo
+`List<E>.subList(fromIndex, toIndex)` provides view of a list bound on both sides. This provides a one-sided view.
+Semantics are the same as subList in terms of non-structural changes.
+
+The `OrNull` variants return `null` instead of throwing `IndexOutOfBoundsException` if indexes are invalid.
