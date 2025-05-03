@@ -3,9 +3,11 @@ package com.moshy.containers
 import kotlin.math.log2
 import kotlin.math.roundToInt
 
+typealias SortedSet<T> = ListAsSortedSet<T>
+
 /** A sorted list with distinct elements. Behavior is undefined if list is not already sorted and distinct. */
-open class SortedSet<T> internal constructor(
-    internal open val list: List<T>,
+open class ListAsSortedSet<T> internal constructor(
+    open val list: List<T>,
     internal val lowerLimit: T? = null,
     internal val upperLimit: T? = null,
     val comparator: Comparator<T>,
@@ -23,7 +25,7 @@ open class SortedSet<T> internal constructor(
 
     override fun equals(other: Any?): Boolean =
         (this === other) ||
-        ((other as? SortedSet<*>)?.let { list == it.list } == true) ||
+        ((other as? ListAsSortedSet<*>)?.let { list == it.list } == true) ||
         ((other as? Collection<*>)?.let { iterationEquals(this, it) } == true)
 
     override fun hashCode(): Int = list.hashCode()
@@ -37,7 +39,7 @@ open class SortedSet<T> internal constructor(
     /** Returns a view of the portion of this set whose elements range from [fromElement], inclusive,
      *  to [toElement], exclusive.
      */
-    fun subSet(fromElement: T, toElement: T): SortedSet<T> {
+    fun subSet(fromElement: T, toElement: T): ListAsSortedSet<T> {
         checkRange(fromElement, -1, -1)
         checkRange(toElement, 0, 1)
         require(comparator.compare(fromElement, toElement) <= 0) {
@@ -49,30 +51,30 @@ open class SortedSet<T> internal constructor(
         var toIndex = indexOf(toElement)
         if (toIndex < 0)
             toIndex = -(toIndex + 1)
-        return SortedSet(list.subList(fromIndex, toIndex), fromElement, toElement, comparator)
+        return ListAsSortedSet(list.subList(fromIndex, toIndex), fromElement, toElement, comparator)
     }
     /** Returns a view of the portion of this set whose elements are strictly less than [toElement]. */
-    fun headSet(toElement: T): SortedSet<T> {
+    fun headSet(toElement: T): ListAsSortedSet<T> {
         checkRange(toElement, 0, 1)
         var at = indexOf(toElement)
         if (at < 0)
             at = -(at + 1)
-        return SortedSet(list.subList(0, at), comparator = comparator, upperLimit = toElement)
+        return ListAsSortedSet(list.subList(0, at), comparator = comparator, upperLimit = toElement)
     }
     /** Returns a view of the portion of this set whose elements are greater than or equal to [fromElement]. */
-    fun tailSet(fromElement: T): SortedSet<T> {
+    fun tailSet(fromElement: T): ListAsSortedSet<T> {
         checkRange(fromElement, -1, -1)
         var at = indexOf(fromElement)
         if (at < 0)
             at = -(at + 1)
-        return SortedSet(list.subList(at, size), comparator = comparator, lowerLimit = fromElement)
+        return ListAsSortedSet(list.subList(at, size), comparator = comparator, lowerLimit = fromElement)
     }
 
     protected fun indexOf(element: T) =
         list.binarySearch(element, comparator)
 
     protected fun doIntersect(elements: Collection<T>) =
-            if (elements is SortedSet<T>)
+            if (elements is ListAsSortedSet<T>)
                 intersect(elements)
             else
                 intersect(elements.copyToSortedSet(comparator))
@@ -104,14 +106,14 @@ open class SortedSet<T> internal constructor(
 }
 
 /** Transforms a sorted (by natural comparison) and distinct list into a set-like object. */
-fun <T: Comparable<T>> List<T>.assertIsSortedSet(): SortedSet<T> =
-    SortedSet(this) { a, b -> a.compareTo(b) }
+fun <T: Comparable<T>> List<T>.assertIsSortedSet(): ListAsSortedSet<T> =
+    ListAsSortedSet(this) { a, b -> a.compareTo(b) }
 /** Transforms a sorted and distinct list into a set-like object. */
-fun <T> List<T>.assertIsSortedSet(c: Comparator<T>): SortedSet<T> =
-    SortedSet(this, comparator = c)
+fun <T> List<T>.assertIsSortedSet(c: Comparator<T>): ListAsSortedSet<T> =
+    ListAsSortedSet(this, comparator = c)
 
 /** Converts a collection to a sorted set by natural comparison. */
-fun <T: Comparable<T>> Collection<T>.copyToSortedSet(): SortedSet<T> {
+fun <T: Comparable<T>> Collection<T>.copyToSortedSet(): ListAsSortedSet<T> {
     val distinct = toSet()
     val sorted = buildList(distinct.size) {
         addAll(distinct)
@@ -120,7 +122,7 @@ fun <T: Comparable<T>> Collection<T>.copyToSortedSet(): SortedSet<T> {
     return sorted.assertIsSortedSet()
 }
 /** Converts a collection to a sorted set. */
-fun <T> Collection<T>.copyToSortedSet(c: Comparator<T>): SortedSet<T> {
+fun <T> Collection<T>.copyToSortedSet(c: Comparator<T>): ListAsSortedSet<T> {
     val distinct = toSet()
     val sorted = buildList(distinct.size) {
         addAll(distinct)
@@ -129,7 +131,7 @@ fun <T> Collection<T>.copyToSortedSet(c: Comparator<T>): SortedSet<T> {
     return sorted.assertIsSortedSet(c)
     }
 
-fun <T> SortedSet<T>.intersect(other: SortedSet<T>): SortedSet<T> {
+fun <T> ListAsSortedSet<T>.intersect(other: ListAsSortedSet<T>): ListAsSortedSet<T> {
     val larger = if (size > other.size) this else other
     val smaller = if (size < other.size) this else other
     val result =
@@ -140,11 +142,11 @@ fun <T> SortedSet<T>.intersect(other: SortedSet<T>): SortedSet<T> {
     return result.assertIsSortedSet(comparator)
 }
 
-private fun <T> Collection<T>.intersectBinarySearch(other: SortedSet<T>): List<T> =
+private fun <T> Collection<T>.intersectBinarySearch(other: ListAsSortedSet<T>): List<T> =
     filter(other::contains)
 
 // derived from https://stackoverflow.com/a/7164616
-private fun <T> SortedSet<T>.intersectLinearScan(other: SortedSet<T>): List<T> {
+private fun <T> ListAsSortedSet<T>.intersectLinearScan(other: ListAsSortedSet<T>): List<T> {
     val thisCmp = comparator
     val thisItr = iterator()
     val otherItr = other.iterator()
@@ -194,15 +196,15 @@ private fun <T> iterationEquals(c1: Collection<T>, c2: Collection<T>): Boolean {
  *  Calls to [MutableSet.add] and [MutableSet.remove] should be minimized because each operation carries a
  *  O(N) performance cost.
  */
-fun <T> SortedSet<T>.buildCopy(builder: MutableSet<T>.() -> Unit): SortedSet<T> =
-    SortedSetBuilder(list.toMutableList(), lowerLimit, upperLimit, comparator).apply(builder)
+fun <T> ListAsSortedSet<T>.buildCopy(builder: MutableSet<T>.() -> Unit): ListAsSortedSet<T> =
+    LaSSBuilder(list.toMutableList(), lowerLimit, upperLimit, comparator).apply(builder)
 
-private class SortedSetBuilder<T>(
+private class LaSSBuilder<T>(
     override val list: MutableList<T>,
     lowerLimit: T?,
     upperLimit: T?,
     comparator: Comparator<T>,
-): SortedSet<T>(list, lowerLimit, upperLimit, comparator), MutableSet<T> {
+): ListAsSortedSet<T>(list, lowerLimit, upperLimit, comparator), MutableSet<T> {
     override fun iterator(): MutableIterator<T> = list.iterator()
 
     override fun add(element: T): Boolean {
@@ -216,7 +218,7 @@ private class SortedSetBuilder<T>(
 
     override fun addAll(elements: Collection<T>): Boolean {
         /* TODO: investigate at what sizes of list and elements there is a point to converting elements
-         *       to SortedList to minimize copy overhead arising from multiple insertions
+         *       to LaSS to minimize copy overhead arising from multiple insertions
          */
         var added = false
         for (e in elements) {

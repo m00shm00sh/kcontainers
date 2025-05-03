@@ -117,14 +117,14 @@ Semantics are the same as subList in terms of non-structural changes.
 
 The `OrNull` variants return `null` instead of throwing `IndexOutOfBoundsException` if indexes are invalid.
 
-## SortedSet
+## ListAsSortedSet (LaSS)
 If the producer of some `List<T>` produces a sorted set, like the output of a database fetch with distinct and
 ordered elements, we can convert the list to an ordered set view with `.assertIsSortedSet()`.
 
 This provides performance opportunities as search and intersection can go from possibly N^2 time to N lg N time or
 even linear time. (Note: there is no JMH code in the test suite to verify this performance improvement.)
 
-An existing `SortedSet<T>` can be mutated with `buildCopy`, which behaves like `buildSet` with initial set.
+An existing `ListAsSortedSet<T>` can be mutated with `buildCopy`, which behaves like `buildSet` with initial set.
 
 If a list that isn't both distinct and sorted is used with `assertIsSortedList()`, the behavior is undefined.
 `copyToSortedSet()` can be used to create a sorted set copy, which behaves as if
@@ -134,3 +134,5 @@ Because Kotlin doesn't have a SortedSet interface, the following methods from `j
 - `subSet(fromElement, toElement): SortedSet`
 - `headSet(toElement): SortedSet`
 - `tailSet(fromElement): SortedSet`
+
+The distinct sorted list is accessible with `.list`.
