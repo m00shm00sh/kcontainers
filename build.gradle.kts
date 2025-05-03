@@ -1,14 +1,12 @@
-import org.jetbrains.dokka.gradle.*
-
 plugins {
-    kotlin("jvm") version "2.0.20"
-    id("org.jetbrains.kotlinx.atomicfu") version "0.26.1"
+    kotlin("jvm") version "2.1.10"
+    id("org.jetbrains.kotlinx.atomicfu") version "0.27.0"
     id("org.jetbrains.dokka") version "1.9.20"
     `maven-publish`
 }
 
 group = "com.moshy.containers"
-version = "0.5.0"
+version = "0.6.0"
 
 repositories {
     mavenCentral()
