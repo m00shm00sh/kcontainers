@@ -21,14 +21,14 @@ class CopyOnWriteContainerInteropTest {
     fun `verify frozen coroC is usable by lockingC`() = runTest {
         coroC.freeze()
         lockingC = LockingCoWTracer(coroC)
-        assertRefsEqual(coroC.data, lockingC.data)
+        assertSame(coroC.data, lockingC.data)
     }
 
     @Test
     fun `verify frozen lockingC is usable by coroC`() {
         lockingC.freeze()
         coroC = CoroCoWTracer(lockingC)
-        assertRefsEqual(lockingC.data, coroC.data)
+        assertSame(lockingC.data, coroC.data)
     }
 
     @Test

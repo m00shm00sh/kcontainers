@@ -17,7 +17,7 @@ class CopyOnWriteContainerTest {
         val c0Ref0 = c0.containerRef()
         c0.write { }
         val c0Ref1 = c0.containerRef()
-        assertRefsUnequal(c0Ref0, c0Ref1)
+        assertNotSame(c0Ref0, c0Ref1)
     }
 
     @Test
@@ -70,7 +70,7 @@ class CopyOnWriteContainerTest {
         val c0Ref = c0.containerRef()
         val c1 = CoWTracer(c0)
         val c1Ref = c1.containerRef()
-        assertRefsEqual(c0Ref, c1Ref)
+        assertSame(c0Ref, c1Ref)
     }
 
     @Test
