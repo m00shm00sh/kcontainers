@@ -117,6 +117,10 @@ Semantics are the same as subList in terms of non-structural changes.
 
 The `OrNull` variants return `null` instead of throwing `IndexOutOfBoundsException` if indexes are invalid.
 
+## List compare
+`Iterable<T: Comparable<T>>.compareTo(Iterable<T>)` enables sorting lists of lists by making each list comparable.
+Behavior is not defined when Collections that are not Lists, or Iterables that are not Collections, are used.
+
 ## ListAsSortedSet (LaSS)
 If the producer of some `List<T>` produces a sorted set, like the output of a database fetch with distinct and
 ordered elements, we can convert the list to an ordered set view with `.assertIsSortedSet()`.
